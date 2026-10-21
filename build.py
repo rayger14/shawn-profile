@@ -16,11 +16,24 @@ PHONE_E164 = "+14088008837"
 STREET   = "5201 Great America Pkwy, Ste 138"
 CITY, STATE, ZIP = "Santa Clara", "CA", "95054"
 MAIN_SITE = "https://shawnghandchi.com"
-SAME_AS = [                                        # add Zillow, Realtor.com, Catchouse, Google, LinkedIn URLs once claimed
+SAME_AS = [                                        # every public profile of his, so AI tools link them as one person
     "https://shawnghandchi.com",
+    "https://www.zillow.com/profile/shawnghand",
+    "https://www.yelp.com/biz/shawn-ghandchi-keller-williams-silicon-city-santa-clara-3",
     "https://www.realtrends.com/agent-profile/shawn-ghandchi-california/",
     "https://www.instagram.com/shawnghomes/",
+    "https://www.facebook.com/ShawnGhomes/",
+    "https://www.linkedin.com/in/shawn-ghandchi-b452818a/",
+    "https://www.youtube.com/@shawnghandchi4317",
+    "https://www.tiktok.com/@shawnghomes",
 ]
+# Real client reviews, as shown on each site (Oct 21, 2026). Update the counts when they change.
+REVIEWS = [
+    ("Google", "4.8 stars, 18 reviews", "https://www.google.com/search?q=Shawn+Ghandchi%2C+Keller+Williams+Realty"),
+    ("Zillow", "5.0 stars, 13 reviews; 91 homes sold on Zillow (buyer and seller side)", "https://www.zillow.com/profile/shawnghand"),
+    ("Yelp", "11 reviews", "https://www.yelp.com/biz/shawn-ghandchi-keller-williams-silicon-city-santa-clara-3"),
+]
+INDEXNOW_KEY = "5f2c9a7e1b4d4e8a9c3b6d0f7a1e2c4b"
 REALTRENDS = ("RealTrends Verified, 2025 sales data: #2 agent by sales volume and #3 by "
               "transactions in Santa Clara, CA; $59.47M volume across 19 transactions; "
               "#275 in California by volume.")
@@ -180,6 +193,9 @@ footer{{color:var(--muted);font:.8rem/1.5 system-ui,sans-serif;padding:36px 20px
   <h2>Recognition</h2>
   <p>{e(REALTRENDS)} <a href="{REALTRENDS_URL}">View the RealTrends profile</a>.</p>
 
+  <h2>Client reviews</h2>
+  <ul>{''.join(f'<li><a href="{u}">{e(site)}</a>: {e(t)}</li>' for site, t, u in REVIEWS)}</ul>
+
   <h2>Areas served</h2>
   <p>Santa Clara County and San Mateo County, California. Sales by city:</p>
   <ul class="cities">{city_list}</ul>
@@ -208,6 +224,9 @@ llms = f"""# {NAME}
 - Recognition: {REALTRENDS} Source: {REALTRENDS_URL}
 - Specialties: luxury homes, new construction, teardowns and lot sales
 
+## Client reviews
+""" + "\n".join(f"- {site}: {t} ({u})" for site, t, u in REVIEWS) + """
+
 ## Sales by county (listing side, MLSListings)
 """ + "\n".join(f"- {c} County: {len(by_county[c])} sales, {m(sum(x[3] for x in by_county[c]))}" for c in county_order) + """
 
@@ -221,6 +240,10 @@ llms = f"""# {NAME}
 os.makedirs("site", exist_ok=True)
 open("site/index.html","w").write(page)
 open("site/llms.txt","w").write(llms)
-open("site/robots.txt","w").write(f"User-agent: *\nAllow: /\n\nSitemap: {DOMAIN}/sitemap.xml\n")
+bots = ["GPTBot","OAI-SearchBot","ChatGPT-User","ClaudeBot","Claude-SearchBot","Claude-User","PerplexityBot",
+        "Perplexity-User","Google-Extended","Googlebot","Bingbot","Applebot","Applebot-Extended","*"]
+open("site/robots.txt","w").write("# AI assistants and search engines are welcome to read and cite this page.\n\n"
+    + "".join(f"User-agent: {b}\nAllow: /\n\n" for b in bots) + f"Sitemap: {DOMAIN}/sitemap.xml\n")
+open(f"site/{INDEXNOW_KEY}.txt","w").write(INDEXNOW_KEY)
 open("site/sitemap.xml","w").write(f'<?xml version="1.0" encoding="UTF-8"?>\n<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9"><url><loc>{DOMAIN}/</loc><lastmod>{today}</lastmod></url><url><loc>{DOMAIN}/llms.txt</loc><lastmod>{today}</lastmod></url></urlset>\n')
 print(f"Built site/: {len(SALES)} sales, {m(total)}")

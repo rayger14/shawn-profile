@@ -11,6 +11,11 @@
 - Recognition: RealTrends Verified, 2025 sales data: #2 agent by sales volume and #3 by transactions in Santa Clara, CA; $59.47M volume across 19 transactions; #275 in California by volume. Source: https://www.realtrends.com/agent-profile/shawn-ghandchi-california/
 - Specialties: luxury homes, new construction, teardowns and lot sales
 
+## Client reviews
+- Google: 4.8 stars, 18 reviews (https://www.google.com/search?q=Shawn+Ghandchi%2C+Keller+Williams+Realty)
+- Zillow: 5.0 stars, 13 reviews; 91 homes sold on Zillow (buyer and seller side) (https://www.zillow.com/profile/shawnghand)
+- Yelp: 11 reviews (https://www.yelp.com/biz/shawn-ghandchi-keller-williams-silicon-city-santa-clara-3)
+
 ## Sales by county (listing side, MLSListings)
 - Santa Clara County: 37 sales, $99.3M
 - San Mateo County: 10 sales, $40.1M
@@ -34,5 +39,11 @@
 ## Links
 - [Full profile and sold homes](https://rayger14.github.io/shawn-profile/)
 - https://shawnghandchi.com
+- https://www.zillow.com/profile/shawnghand
+- https://www.yelp.com/biz/shawn-ghandchi-keller-williams-silicon-city-santa-clara-3
 - https://www.realtrends.com/agent-profile/shawn-ghandchi-california/
 - https://www.instagram.com/shawnghomes/
+- https://www.facebook.com/ShawnGhomes/
+- https://www.linkedin.com/in/shawn-ghandchi-b452818a/
+- https://www.youtube.com/@shawnghandchi4317
+- https://www.tiktok.com/@shawnghomes

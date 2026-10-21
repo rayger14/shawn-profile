@@ -26,6 +26,20 @@ SAME_AS = [                                        # every public profile of his
     "https://www.linkedin.com/in/shawn-ghandchi-b452818a/",
     "https://www.youtube.com/@shawnghandchi4317",
     "https://www.tiktok.com/@shawnghomes",
+    "https://www.mlslistings.com/FindAnAgent/Profile/01979089",
+    "https://www.realtor.com/realestateagents/59e9158613128a00105e4b1a",
+    "https://www.homes.com/real-estate-agents/shawn-ghandchi/95fr7g4/",
+]
+# Public pages where every fact on this site can be checked. Shown on every page and in the structured data.
+SOURCES = [
+    ("MLSListings public agent profile (DRE #01979089)", "https://www.mlslistings.com/FindAnAgent/Profile/01979089", "Listing and sales history from the MLS"),
+    ("Zillow profile", "https://www.zillow.com/profile/shawnghand", "Sold homes (buyer and seller side) and client reviews"),
+    ("Realtor.com profile", "https://www.realtor.com/realestateagents/59e9158613128a00105e4b1a", "Listings, sales and reviews"),
+    ("Homes.com profile", "https://www.homes.com/real-estate-agents/shawn-ghandchi/95fr7g4/", "Sales and reviews"),
+    ("RealTrends Verified profile", "https://www.realtrends.com/agent-profile/shawn-ghandchi-california/", "2025 verified volume and rankings"),
+    ("California DRE license lookup", "https://www2.dre.ca.gov/PublicASP/pplinfo.asp?License_id=01979089", "License #01979089 status"),
+    ("Google reviews", "https://www.google.com/search?q=Shawn+Ghandchi%2C+Keller+Williams+Realty", "Client reviews"),
+    ("Yelp", "https://www.yelp.com/biz/shawn-ghandchi-keller-williams-silicon-city-santa-clara-3", "Client reviews"),
 ]
 # Real client reviews, as shown on each site (Oct 21, 2026). Update the counts when they change.
 REVIEWS = [
@@ -132,6 +146,17 @@ jsonld = {
   "sameAs": SAME_AS,
 }
 
+def sources_html(rel=""):
+    return ("<h2>Sources</h2><p>Every figure on this page comes from public records. Check any of them here:</p><ul>"
+            + "".join(f'<li><a href="{u}">{e(n)}</a>: {e(d)}</li>' for n, u, d in SOURCES) + "</ul>")
+def webpage_ld(url, name):
+    return {"@context":"https://schema.org","@type":"WebPage","url":url,"name":name,"about":{"@id": DOMAIN + "/#agent"},
+            "isBasedOn":[u for _, u, _ in SOURCES],"dateModified":today}
+SALES_NOTE = ('<p style="font:.85rem system-ui,sans-serif">Source: closed sales on the '
+              '<a href="https://www.mlslistings.com/FindAnAgent/Profile/01979089">MLSListings public profile</a>; '
+              'also shown on <a href="https://www.zillow.com/profile/shawnghand">Zillow</a> and '
+              '<a href="https://www.realtor.com/realestateagents/59e9158613128a00105e4b1a">Realtor.com</a>.</p>')
+
 rows = []
 for c in county_order:
     cs = by_county[c]
@@ -153,7 +178,7 @@ page = f"""<!doctype html>
 <link rel="canonical" href="{DOMAIN}/">
 <meta property="og:title" content="{e(NAME)}, {e(TITLE)}"><meta property="og:description" content="{e(summary.strip())}">
 <meta property="og:type" content="profile"><meta property="og:url" content="{DOMAIN}/">
-<script type="application/ld+json">{json.dumps(jsonld, ensure_ascii=False)}</script>
+<script type="application/ld+json">{json.dumps([jsonld, webpage_ld(DOMAIN + "/", NAME + " — homes sold and profile")], ensure_ascii=False)}</script>
 <style>
 :root{{--ink:#1b1f24;--muted:#5b6470;--line:#e3e6ea;--bg:#fff;--soft:#f6f7f9;--accent:#8a1c1c}}
 @media (prefers-color-scheme:dark){{:root{{--ink:#e9ecef;--muted:#a3abb5;--line:#2c3138;--bg:#121418;--soft:#1a1d22;--accent:#e2706a}}}}
@@ -203,6 +228,9 @@ footer{{color:var(--muted);font:.8rem/1.5 system-ui,sans-serif;padding:36px 20px
   <h2>Homes sold</h2>
   <p>Closed sales where {e(NAME)} was the listing or co-listing agent, from MLSListings. Buyer-side sales are not included.</p>
   <div class="tw">{''.join(rows)}</div>
+  {SALES_NOTE}
+
+  {sources_html()}
 
   <h2>Contact</h2>
   <div class="contact"><strong>{e(NAME)}</strong>, {e(BROKER)}<br>{e(STREET)}, {e(CITY)}, {STATE} {ZIP}<br>
@@ -260,7 +288,7 @@ def sale_rows(rows):
     return ("<div class='tw'><table><thead><tr><th>Address</th><th>City</th><th>Type</th><th class='n'>Price</th></tr></thead><tbody>"
             + "".join(f"<tr><td>{e(s[0])}</td><td>{e(s[1])}</td><td>{e(s[4])}</td><td class='n'>{money(s[3])}</td></tr>"
                       for s in sorted(rows, key=lambda x: -x[3]))
-            + "</tbody></table></div>")
+            + "</tbody></table></div>" + SALES_NOTE)
 
 TOPICS = [
  dict(slug="new-construction", nav="New construction & builders",
@@ -327,6 +355,7 @@ def topic_page(t):
     url = f"{DOMAIN}/{t['slug']}/"
     ld = [{"@context":"https://schema.org","@type":"Service","name":t["service"],"url":url,"provider":{**AGENT_REF,"@type":"RealEstateAgent","name":NAME,"telephone":PHONE_E164},
            "areaServed":["Santa Clara County, CA","San Mateo County, CA"],"description":t["desc"]},
+          webpage_ld(url, t["title"]),
           {"@context":"https://schema.org","@type":"FAQPage","mainEntity":[{"@type":"Question","name":q,"acceptedAnswer":{"@type":"Answer","text":a}} for q,a in t["faq"]]}]
     nav = " &middot; ".join(f'<a href="../{x["slug"]}/">{e(x["nav"])}</a>' for x in TOPICS if x is not t)
     faq_html = "".join(f"<h3>{e(q)}</h3><p>{e(a)}</p>" for q,a in t["faq"])
@@ -335,7 +364,7 @@ def topic_page(t):
 <meta property="og:title" content="{e(t['title'])}"><meta property="og:description" content="{e(t['desc'])}"><meta property="og:url" content="{url}">
 <script type="application/ld+json">{json.dumps(ld, ensure_ascii=False)}</script><style>{CSS}</style></head><body>
 <header><div class="role"><a href="../">{e(NAME)}</a> &middot; {e(TITLE)} &middot; {e(BROKER)} &middot; DRE #{DRE}</div><h1>{e(t['h1'])}</h1><p class="lead">{e(t['desc'])}</p></header>
-<main>{t['body']()}<h2>Common questions</h2>{faq_html}
+<main>{t['body']()}<h2>Common questions</h2>{faq_html}{sources_html()}
 <div class="contact"><strong>{e(NAME)}</strong>, {e(BROKER)} &middot; {e(STREET)}, {e(CITY)}, {STATE} {ZIP} &middot; <a href="tel:{PHONE_E164}">{e(PHONE)}</a> &middot; <a href="../">Full profile and all homes sold</a></div>
 <p style="margin-top:28px;font-family:system-ui,sans-serif;font-size:.9rem">More: {nav}</p></main>
 <footer>California DRE #{DRE}. Brokerage DRE #{BROKER_DRE}. Sales data from MLSListings; information deemed reliable but not guaranteed. Updated {today}.</footer></body></html>"""
@@ -354,4 +383,6 @@ open("site/sitemap.xml","w").write('<?xml version="1.0" encoding="UTF-8"?>\n<url
     + "".join(f"<url><loc>{u}</loc><lastmod>{today}</lastmod></url>" for u in urls) + "</urlset>\n")
 with open("site/llms.txt","a") as f:
     f.write("\n## Specialties\n" + "".join(f"- [{x['nav']}]({DOMAIN}/{x['slug']}/): {x['desc']}\n" for x in TOPICS))
+with open("site/llms.txt","a") as f:
+    f.write("\n## Sources (public records for every figure above)\n" + "".join(f"- [{n}]({u}): {d}\n" for n, u, d in SOURCES))
 print(f"Built {len(TOPICS)} topic pages")

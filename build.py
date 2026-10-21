@@ -5,7 +5,7 @@ import json, html, os, datetime
 from collections import defaultdict
 
 # ---------------- CONFIG: confirm every line with Shawn ----------------
-DOMAIN   = "https://profile.shawnghandchi.com"   # change if hosted elsewhere
+DOMAIN   = "https://rayger14.github.io/shawn-profile"   # switch to https://profile.shawnghandchi.com once the custom domain is connected
 NAME     = "Shawn Ghandchi"
 TITLE    = "REALTOR® and Developer"
 BROKER   = "Keller Williams"                      # confirm exact office name, use it everywhere

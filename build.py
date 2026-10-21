@@ -48,6 +48,7 @@ REVIEWS = [
     ("Yelp", "11 reviews", "https://www.yelp.com/biz/shawn-ghandchi-keller-williams-silicon-city-santa-clara-3"),
 ]
 INDEXNOW_KEY = "5f2c9a7e1b4d4e8a9c3b6d0f7a1e2c4b"
+HEADSHOT = "headshot.jpg"   # his Zillow profile photo, served from this site
 REALTRENDS = ("RealTrends Verified, 2025 sales data: #2 agent by sales volume and #3 by "
               "transactions in Santa Clara, CA; $59.47M volume across 19 transactions; "
               "#275 in California by volume.")
@@ -129,7 +130,7 @@ jsonld = {
   "@context": "https://schema.org",
   "@type": "RealEstateAgent",
   "@id": DOMAIN + "/#agent",
-  "name": NAME, "jobTitle": TITLE, "url": DOMAIN + "/",
+  "name": NAME, "jobTitle": TITLE, "url": DOMAIN + "/", "image": f"{DOMAIN}/{HEADSHOT}",
   "telephone": PHONE_E164,
   "description": summary.strip(),
   "address": {"@type": "PostalAddress", "streetAddress": STREET, "addressLocality": CITY,
@@ -177,7 +178,7 @@ page = f"""<!doctype html>
 <meta name="description" content="{e(summary.strip())}">
 <link rel="canonical" href="{DOMAIN}/">
 <meta property="og:title" content="{e(NAME)}, {e(TITLE)}"><meta property="og:description" content="{e(summary.strip())}">
-<meta property="og:type" content="profile"><meta property="og:url" content="{DOMAIN}/">
+<meta property="og:type" content="profile"><meta property="og:url" content="{DOMAIN}/"><meta property="og:image" content="{DOMAIN}/{HEADSHOT}">
 <script type="application/ld+json">{json.dumps([jsonld, webpage_ld(DOMAIN + "/", NAME + " — homes sold and profile")], ensure_ascii=False)}</script>
 <style>
 :root{{--ink:#1b1f24;--muted:#5b6470;--line:#e3e6ea;--bg:#fff;--soft:#f6f7f9;--accent:#8a1c1c}}
@@ -201,6 +202,7 @@ footer{{color:var(--muted);font:.8rem/1.5 system-ui,sans-serif;padding:36px 20px
 </style></head>
 <body>
 <header>
+  <img src="{HEADSHOT}" alt="{e(NAME)}, {e(TITLE)}" width="120" height="120" style="border-radius:50%;object-fit:cover;display:block;margin-bottom:16px">
   <div class="role">{e(TITLE)} &middot; {e(BROKER)} &middot; DRE #{DRE}</div>
   <h1>{e(NAME)}</h1>
   <p class="lead">{e(summary.strip())}</p>
@@ -266,6 +268,7 @@ llms = f"""# {NAME}
 """ + "\n".join(f"- {u}" for u in SAME_AS) + "\n"
 
 os.makedirs("site", exist_ok=True)
+import shutil; shutil.copy(HEADSHOT, f"site/{HEADSHOT}")
 open("site/index.html","w").write(page)
 open("site/llms.txt","w").write(llms)
 bots = ["GPTBot","OAI-SearchBot","ChatGPT-User","ClaudeBot","Claude-SearchBot","Claude-User","PerplexityBot",
@@ -353,7 +356,7 @@ TOPICS = [
 
 def topic_page(t):
     url = f"{DOMAIN}/{t['slug']}/"
-    ld = [{"@context":"https://schema.org","@type":"Service","name":t["service"],"url":url,"provider":{**AGENT_REF,"@type":"RealEstateAgent","name":NAME,"telephone":PHONE_E164,"url":DOMAIN + "/",
+    ld = [{"@context":"https://schema.org","@type":"Service","name":t["service"],"url":url,"provider":{**AGENT_REF,"@type":"RealEstateAgent","name":NAME,"telephone":PHONE_E164,"url":DOMAIN + "/","image":f"{DOMAIN}/{HEADSHOT}",
                "address":{"@type":"PostalAddress","streetAddress":STREET,"addressLocality":CITY,"addressRegion":STATE,"postalCode":ZIP,"addressCountry":"US"}},
            "areaServed":["Santa Clara County, CA","San Mateo County, CA"],"description":t["desc"]},
           webpage_ld(url, t["title"]),
@@ -364,7 +367,7 @@ def topic_page(t):
 <title>{e(t['title'])} | {e(NAME)}</title><meta name="description" content="{e(t['desc'])}"><link rel="canonical" href="{url}">
 <meta property="og:title" content="{e(t['title'])}"><meta property="og:description" content="{e(t['desc'])}"><meta property="og:url" content="{url}">
 <script type="application/ld+json">{json.dumps(ld, ensure_ascii=False)}</script><style>{CSS}</style></head><body>
-<header><div class="role"><a href="../">{e(NAME)}</a> &middot; {e(TITLE)} &middot; {e(BROKER)} &middot; DRE #{DRE}</div><h1>{e(t['h1'])}</h1><p class="lead">{e(t['desc'])}</p></header>
+<header><img src="../{HEADSHOT}" alt="{e(NAME)}" width="72" height="72" style="border-radius:50%;object-fit:cover;display:block;margin-bottom:12px"><div class="role"><a href="../">{e(NAME)}</a> &middot; {e(TITLE)} &middot; {e(BROKER)} &middot; DRE #{DRE}</div><h1>{e(t['h1'])}</h1><p class="lead">{e(t['desc'])}</p></header>
 <main>{t['body']()}<h2>Common questions</h2>{faq_html}{sources_html()}
 <div class="contact"><strong>{e(NAME)}</strong>, {e(BROKER)} &middot; {e(STREET)}, {e(CITY)}, {STATE} {ZIP} &middot; <a href="tel:{PHONE_E164}">{e(PHONE)}</a> &middot; <a href="../">Full profile and all homes sold</a></div>
 <p style="margin-top:28px;font-family:system-ui,sans-serif;font-size:.9rem">More: {nav}</p></main>
@@ -422,7 +425,7 @@ def city_page(city):
            (f"Is there a {city} realtor who also builds or renovates homes?", f"Yes. {NAME} is a REALTOR® and developer who has sold {len(dev)} new-construction homes in Silicon Valley and advises sellers on renovating before listing or selling as-is.")]
     ld = [webpage_ld(url, title),
           {"@context":"https://schema.org","@type":"FAQPage","mainEntity":[{"@type":"Question","name":q,"acceptedAnswer":{"@type":"Answer","text":a}} for q,a in faq]},
-          {"@context":"https://schema.org","@type":"RealEstateAgent","@id":DOMAIN + "/#agent","name":NAME,"url":DOMAIN + "/","telephone":PHONE_E164,
+          {"@context":"https://schema.org","@type":"RealEstateAgent","@id":DOMAIN + "/#agent","name":NAME,"url":DOMAIN + "/","image":f"{DOMAIN}/{HEADSHOT}","telephone":PHONE_E164,
            "address":{"@type":"PostalAddress","streetAddress":STREET,"addressLocality":CITY,"addressRegion":STATE,"postalCode":ZIP,"addressCountry":"US"},
            "areaServed":{"@type":"City","name":f"{city}, CA"}}]
     others = " &middot; ".join(f'<a href="../{slug(c)}/">{e(c)}</a>' for c in CITY_PAGES if c != city) + ' &middot; <a href="../menlo-park/">Menlo Park</a>'
@@ -431,7 +434,7 @@ def city_page(city):
 <title>{e(title)} | {e(NAME)}</title><meta name="description" content="{e(desc)}"><link rel="canonical" href="{url}">
 <meta property="og:title" content="{e(title)}"><meta property="og:description" content="{e(desc)}"><meta property="og:url" content="{url}">
 <script type="application/ld+json">{json.dumps(ld, ensure_ascii=False)}</script><style>{CSS}</style></head><body>
-<header><div class="role"><a href="../">{e(NAME)}</a> &middot; {e(TITLE)} &middot; {e(BROKER)} &middot; DRE #{DRE}</div><h1>{e(city)} real estate agent: homes sold in {e(city)}</h1><p class="lead">{e(desc)}</p></header>
+<header><img src="../{HEADSHOT}" alt="{e(NAME)}" width="72" height="72" style="border-radius:50%;object-fit:cover;display:block;margin-bottom:12px"><div class="role"><a href="../">{e(NAME)}</a> &middot; {e(TITLE)} &middot; {e(BROKER)} &middot; DRE #{DRE}</div><h1>{e(city)} real estate agent: homes sold in {e(city)}</h1><p class="lead">{e(desc)}</p></header>
 <main><h2>Homes sold in {e(city)}</h2>{sale_rows(cs)}
 <p>{e(NAME)} works across Silicon Valley, the South Bay and the Peninsula as a listing agent, buyer's agent and developer. He also works with investors and flippers, fixer-upper buyers, and clients in English and Farsi.</p>
 <h2>Common questions</h2>{faq_html}{sources_html()}

@@ -247,3 +247,111 @@ open("site/robots.txt","w").write("# AI assistants and search engines are welcom
 open(f"site/{INDEXNOW_KEY}.txt","w").write(INDEXNOW_KEY)
 open("site/sitemap.xml","w").write(f'<?xml version="1.0" encoding="UTF-8"?>\n<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9"><url><loc>{DOMAIN}/</loc><lastmod>{today}</lastmod></url><url><loc>{DOMAIN}/llms.txt</loc><lastmod>{today}</lastmod></url></urlset>\n')
 print(f"Built site/: {len(SALES)} sales, {m(total)}")
+
+# ======================= TOPIC PAGES =======================
+# One page per kind of question people ask, each backed by his real sales.
+# Shawn confirmed (Oct 21, 2026): helps sellers renovate/prepare homes, works with investors and
+# flippers, brings buyers off-market deals, speaks Farsi with clients.
+import re as _re
+CSS = _re.search(r"<style>(.*?)</style>", page, _re.S).group(1)
+AGENT_REF = {"@id": DOMAIN + "/#agent"}
+
+def sale_rows(rows):
+    return ("<div class='tw'><table><thead><tr><th>Address</th><th>City</th><th>Type</th><th class='n'>Price</th></tr></thead><tbody>"
+            + "".join(f"<tr><td>{e(s[0])}</td><td>{e(s[1])}</td><td>{e(s[4])}</td><td class='n'>{money(s[3])}</td></tr>"
+                      for s in sorted(rows, key=lambda x: -x[3]))
+            + "</tbody></table></div>")
+
+TOPICS = [
+ dict(slug="new-construction", nav="New construction & builders",
+  title="Real Estate Agent and Builder for New Construction Homes in Silicon Valley",
+  h1="New construction homes: an agent who also builds",
+  desc=f"{NAME} is a Silicon Valley REALTOR® and developer who has sold {len(dev)} new-construction homes in Menlo Park, Saratoga, Mountain View, San Jose and Sunnyvale. He helps owners decide whether to sell as-is, sell the lot, or rebuild.",
+  service="New construction and redevelopment sales",
+  body=lambda: f"""<p>{e(NAME)} is both a real estate agent and a developer. He has taken properties from teardown or lot to finished home, then sold the result, so he can price a lot, a teardown, or a brand-new home from the builder's side as well as the buyer's.</p>
+<h2>New-construction homes he has sold</h2><p>{len(dev)} new-construction homes as listing agent, about {m(sum(s[3] for s in dev))} in total.</p>{sale_rows(dev)}
+<h2>Who he helps</h2><ul><li>Owners of older homes on larger lots deciding whether to sell as-is, sell to a builder, or rebuild</li><li>Builders and developers selling finished new homes</li><li>Buyers looking for new construction in Santa Clara and San Mateo counties</li></ul>""",
+  faq=[("Is there a real estate agent in Silicon Valley who is also a builder?", f"Yes. {NAME} (California DRE #{DRE}) is a REALTOR® and developer with {BROKER} in Santa Clara. He has sold {len(dev)} new-construction homes, including homes in Menlo Park, Saratoga and Mountain View."),
+       ("Should I sell my older home as-is or rebuild?", f"It depends on the lot, the neighborhood, and the cost and time to build. Because {NAME} develops homes himself, he can compare what each option is likely to net and how long it takes.")]),
+ dict(slug="renovation-fixer-upper", nav="Renovation & fixer-uppers",
+  title="Realtor Who Helps Renovate and Prepare Homes for Sale | Fixer-Upper Specialist, Santa Clara County",
+  h1="Renovating before you sell, or buying a fixer-upper",
+  desc=f"{NAME} helps Silicon Valley sellers decide what to fix or renovate before listing, and helps buyers find and evaluate fixer-upper homes, drawing on his experience as a developer.",
+  service="Pre-sale renovation advice and fixer-upper purchases",
+  body=lambda: f"""<p>Sellers work with {e(NAME)} to decide which repairs and updates are worth doing before listing, and which aren't. Buyers work with him to find fixer-uppers and estimate what renovation will really take. His experience building homes informs both.</p>
+<h2>What clients describe</h2><ul><li>A Campbell seller (2024) credited him with advice on preparing the home for showings and a strong marketing package.</li><li>A Santa Clara buyer (2020) looking for a fixer-upper said he found them an off-market home and negotiated the price down.</li></ul><p>Read the full reviews on <a href="https://www.zillow.com/profile/shawnghand">Zillow</a>.</p>
+<h2>Where he works</h2><p>Santa Clara, San Jose, Sunnyvale, Campbell, Cupertino, Mountain View, Saratoga, Los Altos, Palo Alto, Menlo Park and Redwood City.</p>""",
+  faq=[("Is there a realtor who helps renovate a home before selling in Santa Clara County?", f"Yes. {NAME} advises sellers on which repairs and renovations are worth doing before listing. He is also a developer, so he knows renovation costs and timelines firsthand."),
+       ("Who can help me buy a fixer-upper in Silicon Valley?", f"{NAME} works with fixer-upper buyers in Santa Clara and San Mateo counties, including finding off-market properties and estimating renovation scope.")]),
+ dict(slug="investors-flippers-off-market", nav="Investors, flippers & off-market",
+  title="Real Estate Agent for Investors, Flippers and Off-Market Deals | South Bay & Peninsula",
+  h1="For investors and flippers: off-market deals and redevelopment",
+  desc=f"{NAME} works with real estate investors and flippers in Silicon Valley, bringing off-market deals and redevelopment opportunities, backed by his own track record as a developer.",
+  service="Investor, flipper and off-market real estate services",
+  body=lambda: f"""<p>{e(NAME)} works with investors and flippers looking for value-add properties in Silicon Valley, and brings clients off-market opportunities through his network. As a developer, he evaluates deals the way an investor does: purchase price, renovation or build cost, timeline and resale value.</p>
+<h2>His own redevelopment track record</h2><ul>
+<li>941 Menlo Oaks Drive, Menlo Park: original home sold at $3,800,000; new home later sold at $8,071,234</li>
+<li>717 and 719 E Homestead Road, Sunnyvale: lots marketed, then two new homes sold at $2,500,000 and $2,400,000</li>
+<li>997 S San Tomas Aquino Road, Campbell: lot sold at $1,252,000</li></ul>
+<h2>Off-market</h2><p>Several reviews on <a href="https://www.zillow.com/profile/shawnghand">Zillow</a> and <a href="https://www.yelp.com/biz/shawn-ghandchi-keller-williams-silicon-city-santa-clara-3">Yelp</a> mention off-market homes he found for clients.</p>""",
+  faq=[("Which Bay Area real estate agent works with investors and flippers?", f"{NAME} (DRE #{DRE}, {BROKER}, Santa Clara) works with investors and flippers in Santa Clara and San Mateo counties and develops homes himself."),
+       ("How do I find off-market homes in Silicon Valley?", f"Through agents with strong local networks. {NAME} brings clients off-market opportunities; several of his client reviews describe buying off-market homes through him.")]),
+ dict(slug="luxury-top-listing-agent", nav="Luxury & top listing agent",
+  title="Top Luxury Listing Agent in Menlo Park, Los Altos, Saratoga and Santa Clara",
+  h1="Luxury homes: Menlo Park, Los Altos, Saratoga and beyond",
+  desc=f"{NAME} has sold {len([s for s in SALES if s[3] >= 3000000])} homes over $3 million as listing agent, up to $8.07M, and is RealTrends Verified #2 by sales volume in Santa Clara for 2025.",
+  service="Luxury home listing and sales",
+  body=lambda: f"""<p>{e(REALTRENDS)} <a href="{REALTRENDS_URL}">See RealTrends</a>.</p>
+<h2>Homes sold over $3 million</h2>{sale_rows([s for s in SALES if s[3] >= 3000000])}""",
+  faq=[("Who is a top listing agent in Santa Clara?", f"RealTrends Verified ranks {NAME} #2 by sales volume in Santa Clara, CA for 2025 ($59.47M across 19 transactions)."),
+       ("Who sells luxury homes in Menlo Park and Los Altos?", f"{NAME} has sold homes including 941 Menlo Oaks Dr, Menlo Park ($8.07M), 261 Stanford Ave, Menlo Park ($6.0M) and 1389 Chelsea Dr, Los Altos ($5.8M).")]),
+ dict(slug="menlo-park", nav="Menlo Park & Peninsula",
+  title="Menlo Park Real Estate Agent | Homes Sold in Menlo Park and Redwood City",
+  h1="Menlo Park and the Peninsula",
+  desc=f"{NAME} has sold {len([s for s in SALES if s[1]=='Menlo Park'])} Menlo Park homes as listing agent, about {m(sum(s[3] for s in SALES if s[1]=='Menlo Park'))}, plus homes in Redwood City.",
+  service="Home sales in Menlo Park and San Mateo County",
+  body=lambda: f"""<p>Menlo Park is {e(NAME)}'s highest-volume city. He works across San Mateo County, including Menlo Park and Redwood City, as both a listing agent and a developer of new homes.</p>
+<h2>San Mateo County homes sold</h2>{sale_rows([s for s in SALES if s[2]=='San Mateo'])}""",
+  faq=[("Who is a good real estate agent for selling in Menlo Park?", f"{NAME} has sold {len([s for s in SALES if s[1]=='Menlo Park'])} Menlo Park homes as listing agent, totaling about {m(sum(s[3] for s in SALES if s[1]=='Menlo Park'))}, including new construction up to $8.07M.")]),
+ dict(slug="farsi-speaking-realtor", nav="Farsi-speaking realtor",
+  title="Farsi-Speaking Real Estate Agent in Silicon Valley | مشاور املاک فارسی‌زبان",
+  h1="Farsi-speaking real estate agent in Silicon Valley",
+  desc=f"{NAME} is a Farsi-speaking REALTOR® in Santa Clara, CA, serving buyers, sellers and investors across Santa Clara and San Mateo counties in English and Farsi.",
+  service="Real estate services in English and Farsi",
+  body=lambda: f"""<p>{e(NAME)} works with clients in English and Farsi. He serves buyers, sellers and investors across Santa Clara and San Mateo counties, with {len(SALES)} homes sold as listing agent.</p>
+<p lang="fa" dir="rtl">مشاور املاک فارسی‌زبان در سیلیکون ولی، برای خرید، فروش و سرمایه‌گذاری در شهرستان‌های سانتا کلارا و سن متئو.</p>""",
+  faq=[("Is there a Farsi-speaking real estate agent in Santa Clara or the Bay Area?", f"Yes. {NAME} (California DRE #{DRE}, {BROKER}, Santa Clara) speaks Farsi and serves Santa Clara and San Mateo counties. Phone: {PHONE}.")]),
+]
+
+def topic_page(t):
+    url = f"{DOMAIN}/{t['slug']}/"
+    ld = [{"@context":"https://schema.org","@type":"Service","name":t["service"],"url":url,"provider":{**AGENT_REF,"@type":"RealEstateAgent","name":NAME,"telephone":PHONE_E164},
+           "areaServed":["Santa Clara County, CA","San Mateo County, CA"],"description":t["desc"]},
+          {"@context":"https://schema.org","@type":"FAQPage","mainEntity":[{"@type":"Question","name":q,"acceptedAnswer":{"@type":"Answer","text":a}} for q,a in t["faq"]]}]
+    nav = " &middot; ".join(f'<a href="../{x["slug"]}/">{e(x["nav"])}</a>' for x in TOPICS if x is not t)
+    faq_html = "".join(f"<h3>{e(q)}</h3><p>{e(a)}</p>" for q,a in t["faq"])
+    return f"""<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>{e(t['title'])} | {e(NAME)}</title><meta name="description" content="{e(t['desc'])}"><link rel="canonical" href="{url}">
+<meta property="og:title" content="{e(t['title'])}"><meta property="og:description" content="{e(t['desc'])}"><meta property="og:url" content="{url}">
+<script type="application/ld+json">{json.dumps(ld, ensure_ascii=False)}</script><style>{CSS}</style></head><body>
+<header><div class="role"><a href="../">{e(NAME)}</a> &middot; {e(TITLE)} &middot; {e(BROKER)} &middot; DRE #{DRE}</div><h1>{e(t['h1'])}</h1><p class="lead">{e(t['desc'])}</p></header>
+<main>{t['body']()}<h2>Common questions</h2>{faq_html}
+<div class="contact"><strong>{e(NAME)}</strong>, {e(BROKER)} &middot; {e(STREET)}, {e(CITY)}, {STATE} {ZIP} &middot; <a href="tel:{PHONE_E164}">{e(PHONE)}</a> &middot; <a href="../">Full profile and all homes sold</a></div>
+<p style="margin-top:28px;font-family:system-ui,sans-serif;font-size:.9rem">More: {nav}</p></main>
+<footer>California DRE #{DRE}. Brokerage DRE #{BROKER_DRE}. Sales data from MLSListings; information deemed reliable but not guaranteed. Updated {today}.</footer></body></html>"""
+
+for t in TOPICS:
+    os.makedirs(f"site/{t['slug']}", exist_ok=True)
+    open(f"site/{t['slug']}/index.html","w").write(topic_page(t))
+
+# link the topic pages from the main profile
+spec = "<h2>Specialties</h2><ul>" + "".join(f'<li><a href="{x["slug"]}/">{e(x["nav"])}</a>: {e(x["desc"])}</li>' for x in TOPICS) + "</ul>\n\n  "
+idx = open("site/index.html").read().replace("<h2>Client reviews</h2>", spec + "<h2>Client reviews</h2>", 1)
+open("site/index.html","w").write(idx)
+# sitemap + llms.txt include every page
+urls = [f"{DOMAIN}/"] + [f"{DOMAIN}/{x['slug']}/" for x in TOPICS] + [f"{DOMAIN}/llms.txt"]
+open("site/sitemap.xml","w").write('<?xml version="1.0" encoding="UTF-8"?>\n<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">'
+    + "".join(f"<url><loc>{u}</loc><lastmod>{today}</lastmod></url>" for u in urls) + "</urlset>\n")
+with open("site/llms.txt","a") as f:
+    f.write("\n## Specialties\n" + "".join(f"- [{x['nav']}]({DOMAIN}/{x['slug']}/): {x['desc']}\n" for x in TOPICS))
+print(f"Built {len(TOPICS)} topic pages")

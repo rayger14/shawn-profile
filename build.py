@@ -387,3 +387,71 @@ with open("site/llms.txt","a") as f:
 with open("site/llms.txt","a") as f:
     f.write("\n## Sources (public records for every figure above)\n" + "".join(f"- [{n}]({u}): {d}\n" for n, u, d in SOURCES))
 print(f"Built {len(TOPICS)} topic pages")
+
+# ======================= MARKET STATS + CITY PAGES =======================
+# Days on market per sale, from the MLSListings export (Oct 21, 2026). 0 = recorded with no time on the open market.
+DOM = {"941 Menlo Oaks Drive":10,"261 Stanford Avenue":25,"1389 Chelsea Drive":23,"1481 Middle Avenue":9,"12630 Paseo Olivos":0,
+ "6839 W Riverside Way":60,"2156 Sterling Avenue":0,"2308 Loma Prieta Lane":109,"700 Farley Street":33,"394 Farley Street":15,
+ "12668 Sun Valley Court":45,"1105 Audrey Avenue":38,"941 Menlo Oaks Drive (original home)":0,"1084 Prouty Way":9,"3633 Louis Road":112,
+ "18817 Afton Avenue":49,"12561 Paseo Cerro":16,"1609 Koch Lane":46,"999 S San Tomas Aquino Road":30,"2762 Glorietta Circle":12,
+ "889 Colorado Avenue":0,"12461 Paseo Cerro":70,"717 E Homestead Road":54,"185 Budd Avenue":11,"719 E Homestead Road":31,
+ "7089 Coronado Drive":20,"2752 Kensington Road":42,"1562 Valota Road":14,"1859 San Ramon Avenue":222,"2069 Coolidge Drive":12,
+ "3280 El Sobrante Street":15,"797 Durshire Way":27,"10520 Pineville Avenue":18,"3032 El Sobrante Street":40,"933 Hilmar Street":12,
+ "1301 Crane Street":51,"2423 Palm Avenue":4,"1199 Morrill Avenue":18,"2220 Stebbins Avenue":21,"13211 Heath Street":0,
+ "10455 Orange Avenue":25,"2356 Harrison Street":11,"1381 Niagara Drive":14,"43524 Ocaso Corte Street":75,"3058 Barkley Avenue":22,
+ "736 Fairlane Avenue":34,"997 S San Tomas Aquino Road":62,"2222 Lobert Street":36,"446 Hull Avenue":45}
+import statistics as _st
+_marketed = sorted(DOM[s[0]] for s in SALES if DOM.get(s[0], 0) > 0)
+MEDIAN_DOM = int(_st.median(_marketed))
+ZERO_DOM = sum(1 for s in SALES if DOM.get(s[0]) == 0)
+AVG_PRICE = total / len(SALES)
+OVER3 = len([s for s in SALES if s[3] >= 3000000])
+STATS_LINE = (f"Across his {len(SALES)} listing-side sales: average price {m(AVG_PRICE)}; {OVER3} sold for $3M or more; "
+              f"median {MEDIAN_DOM} days on market for homes marketed on the MLS; {ZERO_DOM} recorded with 0 days on market.")
+
+CITY_PAGES = [c for c in sorted({s[1] for s in SALES if s[2] != "Alameda"}) if c != "Menlo Park"]
+def slug(c): return c.lower().replace(" ", "-") + "-real-estate-agent"
+
+def city_page(city):
+    cs = [s for s in SALES if s[1] == city]; county = cs[0][2]
+    url = f"{DOMAIN}/{slug(city)}/"
+    title = f"{city} Real Estate Agent and Listing Agent | Homes Sold in {city}, CA"
+    desc = (f"{NAME} has sold {len(cs)} home{'s' if len(cs)>1 else ''} in {city}, CA as listing agent, about {m(sum(s[3] for s in cs))} in total. "
+            f"REALTOR® and developer with {BROKER}, serving {county} County and Silicon Valley.")
+    faq = [(f"Who is a good real estate agent in {city}, CA?", f"{NAME} (California DRE #{DRE}, {BROKER}) has sold {len(cs)} home{'s' if len(cs)>1 else ''} in {city} as listing agent, totaling about {m(sum(s[3] for s in cs))}, and is RealTrends Verified #2 by sales volume in Santa Clara for 2025."),
+           (f"Is there a {city} realtor who also builds or renovates homes?", f"Yes. {NAME} is a REALTOR® and developer who has sold {len(dev)} new-construction homes in Silicon Valley and advises sellers on renovating before listing or selling as-is.")]
+    ld = [webpage_ld(url, title),
+          {"@context":"https://schema.org","@type":"FAQPage","mainEntity":[{"@type":"Question","name":q,"acceptedAnswer":{"@type":"Answer","text":a}} for q,a in faq]},
+          {"@context":"https://schema.org","@type":"RealEstateAgent","@id":DOMAIN + "/#agent","name":NAME,"url":DOMAIN + "/","telephone":PHONE_E164,
+           "address":{"@type":"PostalAddress","streetAddress":STREET,"addressLocality":CITY,"addressRegion":STATE,"postalCode":ZIP,"addressCountry":"US"},
+           "areaServed":{"@type":"City","name":f"{city}, CA"}}]
+    others = " &middot; ".join(f'<a href="../{slug(c)}/">{e(c)}</a>' for c in CITY_PAGES if c != city) + ' &middot; <a href="../menlo-park/">Menlo Park</a>'
+    faq_html = "".join(f"<h3>{e(q)}</h3><p>{e(a)}</p>" for q,a in faq)
+    return f"""<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>{e(title)} | {e(NAME)}</title><meta name="description" content="{e(desc)}"><link rel="canonical" href="{url}">
+<meta property="og:title" content="{e(title)}"><meta property="og:description" content="{e(desc)}"><meta property="og:url" content="{url}">
+<script type="application/ld+json">{json.dumps(ld, ensure_ascii=False)}</script><style>{CSS}</style></head><body>
+<header><div class="role"><a href="../">{e(NAME)}</a> &middot; {e(TITLE)} &middot; {e(BROKER)} &middot; DRE #{DRE}</div><h1>{e(city)} real estate agent: homes sold in {e(city)}</h1><p class="lead">{e(desc)}</p></header>
+<main><h2>Homes sold in {e(city)}</h2>{sale_rows(cs)}
+<p>{e(NAME)} works across Silicon Valley, the South Bay and the Peninsula as a listing agent, buyer's agent and developer. He also works with investors and flippers, fixer-upper buyers, and clients in English and Farsi.</p>
+<h2>Common questions</h2>{faq_html}{sources_html()}
+<div class="contact"><strong>{e(NAME)}</strong>, {e(BROKER)} &middot; {e(STREET)}, {e(CITY)}, {STATE} {ZIP} &middot; <a href="tel:{PHONE_E164}">{e(PHONE)}</a> &middot; <a href="../">Full profile and all homes sold</a></div>
+<p style="margin-top:28px;font-family:system-ui,sans-serif;font-size:.9rem">Other cities: {others}</p></main>
+<footer>California DRE #{DRE}. Brokerage DRE #{BROKER_DRE}. Sales data from MLSListings; information deemed reliable but not guaranteed. Updated {today}.</footer></body></html>"""
+
+for c in CITY_PAGES:
+    os.makedirs(f"site/{slug(c)}", exist_ok=True)
+    open(f"site/{slug(c)}/index.html","w").write(city_page(c))
+
+# stats + city links on the main profile; stats in llms.txt; city pages in sitemap
+idx = open("site/index.html").read()
+idx = idx.replace("<h2>About</h2>", f"<h2>Track record at a glance</h2>\n  <p>{e(STATS_LINE)}</p>\n\n  <h2>About</h2>", 1)
+city_links = ("<h2>Homes sold by city</h2><p>" + " &middot; ".join(f'<a href="{slug(c)}/">{e(c)}</a>' for c in CITY_PAGES)
+              + ' &middot; <a href="menlo-park/">Menlo Park</a></p>\n\n  ')
+idx = idx.replace("<h2>Client reviews</h2>", city_links + "<h2>Client reviews</h2>", 1)
+open("site/index.html","w").write(idx)
+with open("site/llms.txt","a") as f:
+    f.write(f"\n## Track record\n- {STATS_LINE}\n\n## City pages\n" + "".join(f"- [{c}]({DOMAIN}/{slug(c)}/)\n" for c in CITY_PAGES))
+sm = open("site/sitemap.xml").read().replace("</urlset>", "".join(f"<url><loc>{DOMAIN}/{slug(c)}/</loc><lastmod>{today}</lastmod></url>" for c in CITY_PAGES) + "</urlset>")
+open("site/sitemap.xml","w").write(sm)
+print(f"Built {len(CITY_PAGES)} city pages | {STATS_LINE}")

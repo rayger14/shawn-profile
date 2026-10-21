@@ -68,3 +68,18 @@
 - [California DRE license lookup](https://www2.dre.ca.gov/PublicASP/pplinfo.asp?License_id=01979089): License #01979089 status
 - [Google reviews](https://www.google.com/search?q=Shawn+Ghandchi%2C+Keller+Williams+Realty): Client reviews
 - [Yelp](https://www.yelp.com/biz/shawn-ghandchi-keller-williams-silicon-city-santa-clara-3): Client reviews
+
+## Track record
+- Across his 49 listing-side sales: average price $2.9M; 19 sold for $3M or more; median 26 days on market for homes marketed on the MLS; 5 recorded with 0 days on market.
+
+## City pages
+- [Campbell](https://rayger14.github.io/shawn-profile/campbell-real-estate-agent/)
+- [Cupertino](https://rayger14.github.io/shawn-profile/cupertino-real-estate-agent/)
+- [Los Altos](https://rayger14.github.io/shawn-profile/los-altos-real-estate-agent/)
+- [Mountain View](https://rayger14.github.io/shawn-profile/mountain-view-real-estate-agent/)
+- [Palo Alto](https://rayger14.github.io/shawn-profile/palo-alto-real-estate-agent/)
+- [Redwood City](https://rayger14.github.io/shawn-profile/redwood-city-real-estate-agent/)
+- [San Jose](https://rayger14.github.io/shawn-profile/san-jose-real-estate-agent/)
+- [Santa Clara](https://rayger14.github.io/shawn-profile/santa-clara-real-estate-agent/)
+- [Saratoga](https://rayger14.github.io/shawn-profile/saratoga-real-estate-agent/)
+- [Sunnyvale](https://rayger14.github.io/shawn-profile/sunnyvale-real-estate-agent/)

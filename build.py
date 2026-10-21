@@ -353,7 +353,8 @@ TOPICS = [
 
 def topic_page(t):
     url = f"{DOMAIN}/{t['slug']}/"
-    ld = [{"@context":"https://schema.org","@type":"Service","name":t["service"],"url":url,"provider":{**AGENT_REF,"@type":"RealEstateAgent","name":NAME,"telephone":PHONE_E164},
+    ld = [{"@context":"https://schema.org","@type":"Service","name":t["service"],"url":url,"provider":{**AGENT_REF,"@type":"RealEstateAgent","name":NAME,"telephone":PHONE_E164,"url":DOMAIN + "/",
+               "address":{"@type":"PostalAddress","streetAddress":STREET,"addressLocality":CITY,"addressRegion":STATE,"postalCode":ZIP,"addressCountry":"US"}},
            "areaServed":["Santa Clara County, CA","San Mateo County, CA"],"description":t["desc"]},
           webpage_ld(url, t["title"]),
           {"@context":"https://schema.org","@type":"FAQPage","mainEntity":[{"@type":"Question","name":q,"acceptedAnswer":{"@type":"Answer","text":a}} for q,a in t["faq"]]}]

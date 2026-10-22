@@ -550,3 +550,70 @@ idx = idx.replace("<h2>Sources</h2>", _faq_html + "\n\n  <h2>Sources</h2>", 1)
 idx = idx.replace("</head>", f'<script type="application/ld+json">{json.dumps(_faq_ld, ensure_ascii=False)}</script></head>', 1)
 open("site/index.html","w").write(idx)
 print(f"Main page Q&A: {len(MAIN_FAQ)} | specialty pages: +{sum(len(v) for v in EXTRA_FAQ.values())} | city pages: +2 each")
+
+# ======================= CLIENT QUOTES =======================
+# Verbatim excerpts from Shawn's public Zillow reviews (pulled Oct 22, 2026), trimmed only at sentence
+# boundaries. Attributed by role/city/year, not reviewer name. No Review/AggregateRating schema on purpose
+# (Google treats self-hosted ratings as self-serving).
+ZILLOW = "https://www.zillow.com/profile/shawnghand"
+QUOTES = [
+ dict(id="campbell-prep", who="Seller, Campbell (San Tomas), 2024",
+      text="He gave us advice on how to prepare our home for showing, and he made a stunning brochure for our home to give to interested parties.",
+      pages=["", "renovation-fixer-upper", "campbell-real-estate-agent"]),
+ dict(id="campbell-price", who="Seller, Campbell (San Tomas), 2024",
+      text="I am sure we would not have gotten as high a price as we did for our home without Shawn representing us.",
+      pages=["campbell-real-estate-agent", "luxury-top-listing-agent"]),
+ dict(id="mv-newbuild", who="Buyer, Mountain View, 2021",
+      text="Shawn was able to use his extensive network to secure us the very first showing the moment our new-construction dream home came to the market.",
+      pages=["new-construction", "mountain-view-real-estate-agent"]),
+ dict(id="sc-offmarket", who="Buyer, Santa Clara, 2020",
+      text="We were looking for a fixer upper in Santa Clara and Shawn was an absolute lifesaver! He found us a great off-market deal and negotiated to close the deal even lower than our desired price before hitting the market.",
+      pages=["", "renovation-fixer-upper", "investors-flippers-off-market", "santa-clara-real-estate-agent"]),
+ dict(id="sc-contractors", who="Buyer, Santa Clara, 2020",
+      text="He is the most responsive and professional realtor I have worked with and has great connections with all the contractors in the area.",
+      pages=["new-construction", "renovation-fixer-upper"]),
+ dict(id="cupertino-recommend", who="Buyer and seller, Cupertino, 2017",
+      text="Would not hesitate for a minute to recommend him to anyone looking to buy or sell their home in the Cupertino area.",
+      pages=["cupertino-real-estate-agent"]),
+ dict(id="cupertino-investment", who="Buyer, Cupertino, 2017",
+      text="I would highly recommend him to anyone who is looking for a home or investment property in the local bay area.",
+      pages=["investors-flippers-off-market", "cupertino-real-estate-agent"]),
+ dict(id="rwc-available", who="Buyer and seller, Redwood City (Woodside Plaza), 2017",
+      text="He was always available for us, by phone, text, or in person.",
+      pages=["redwood-city-real-estate-agent", "menlo-park"]),
+ dict(id="rwc-overbid", who="Buyer, Redwood City (Woodside Plaza), 2017",
+      text="Then we met Shawn and he was able to find exactly what we were looking for. After his negotiations, he was able to get the deal for us.",
+      pages=["redwood-city-real-estate-agent", "menlo-park"]),
+ dict(id="sj-gogetter", who="Buyer, West San Jose, 2018",
+      text="He does what he says he will do and really goes above the call of duty.",
+      pages=["san-jose-real-estate-agent"]),
+ dict(id="sj-attics", who="Buyer and seller, San Jose (95120), 2018",
+      text="He is honest and hands-on (he even crawled into creepy attics to check insulation for us!), and he really helped to take the pressure off of us.",
+      pages=["", "san-jose-real-estate-agent"]),
+ dict(id="sc-overasking", who="Seller, Santa Clara, 2018",
+      text="With his great negotiation skills, he sold my house way way over asking and a lot more than the neighborhood comps!",
+      pages=["", "santa-clara-real-estate-agent", "luxury-top-listing-agent"]),
+]
+def quotes_block(slug):
+    qs = [q for q in QUOTES if slug in q["pages"]]
+    if not qs: return ""
+    items = "".join(
+        f'<blockquote style="margin:14px 0;padding:10px 16px;border-left:3px solid var(--accent);background:var(--soft)">'
+        f'<p style="margin:0 0 6px">&ldquo;{e(q["text"])}&rdquo;</p>'
+        f'<cite style="font:.85rem system-ui,sans-serif;color:var(--muted);font-style:normal">{e(q["who"])} &middot; '
+        f'<a href="{ZILLOW}">Zillow review</a></cite></blockquote>' for q in qs)
+    return f'<h2>What clients say</h2>{items}\n\n  '
+def _inject(path, slug, marker):
+    h = open(path).read()
+    blk = quotes_block(slug)
+    if blk and marker in h:
+        h = h.replace(marker, blk + marker, 1)
+        open(path, "w").write(h)
+        return len([q for q in QUOTES if slug in q["pages"]])
+    return 0
+_n = _inject("site/index.html", "", "<h2>Client reviews</h2>")
+for _slug in [t["slug"] for t in TOPICS] + [slug(c) for c in CITY_PAGES]:
+    _n += _inject(f"site/{_slug}/index.html", _slug, "<h2>Common questions</h2>")
+with open("site/llms.txt", "a") as f:
+    f.write("\n## What clients say (verbatim excerpts from Zillow reviews)\n" + "".join(f'- "{q["text"]}" ({q["who"]}, Zillow: {ZILLOW})\n' for q in QUOTES))
+print(f"Placed {_n} client quotes across pages")

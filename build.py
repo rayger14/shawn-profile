@@ -373,6 +373,63 @@ def topic_page(t):
 <p style="margin-top:28px;font-family:system-ui,sans-serif;font-size:.9rem">More: {nav}</p></main>
 <footer>California DRE #{DRE}. Brokerage DRE #{BROKER_DRE}. Sales data from MLSListings; information deemed reliable but not guaranteed. Updated {today}.</footer></body></html>"""
 
+# ---------- Extra Q&As (only facts already confirmed) ----------
+def _sales(f): return [x for x in SALES if f(x)]
+_mp = _sales(lambda x: x[1]=="Menlo Park"); _rwc = _sales(lambda x: x[1]=="Redwood City")
+_lots = ["717 E Homestead Road, Sunnyvale", "719 E Homestead Road, Sunnyvale", "997 S San Tomas Aquino Road, Campbell", "12668 Sun Valley Court, Saratoga"]
+_dev_cities = sorted({x[1] for x in dev})
+EXTRA_FAQ = {
+ "new-construction": [
+  ("Who can sell a new-construction home in Menlo Park, Saratoga or Mountain View?",
+   f"{NAME} has sold {len(dev)} new-construction homes as listing agent, in {', '.join(_dev_cities)}. Examples: 941 Menlo Oaks Drive, Menlo Park ($8,071,234); 261 Stanford Avenue, Menlo Park ($6,000,000); 12630 Paseo Olivos, Saratoga ($5,248,000)."),
+  ("Can a real estate agent help me decide whether to sell my teardown or build a new home?",
+   f"Yes. {NAME} is both a REALTOR® and a developer, so he can compare selling as-is, selling to a builder, or rebuilding and selling, using his own new-construction sales as reference."),
+  ("Which Silicon Valley agent sells homes to builders and developers?",
+   f"{NAME} has marketed lots and teardown properties to builders, including {', '.join(_lots[:3])}, and has sold the finished new homes afterward."),
+ ],
+ "renovation-fixer-upper": [
+  ("Should I renovate my house before selling in Silicon Valley?",
+   f"It depends on the home and the neighborhood. {NAME} helps sellers decide which repairs and updates are likely to pay back before listing and which are not, drawing on his experience as a developer."),
+  ("Is there an agent who helps prepare a home for sale in Campbell, San Jose or Santa Clara?",
+   f"Yes. Client reviews describe {NAME} advising sellers on how to prepare their home for showings and producing marketing materials. He has sold {len(_sales(lambda x: x[1] in ('Campbell','San Jose','Santa Clara')))} homes in Campbell, San Jose and Santa Clara as listing agent."),
+  ("Who can help me find a fixer-upper or off-market home in Santa Clara County?",
+   f"{NAME} works with fixer-upper buyers and brings clients off-market opportunities. A Santa Clara buyer's review describes him finding an off-market fixer-upper and negotiating the price down."),
+ ],
+ "investors-flippers-off-market": [
+  ("Is there a real estate agent for house flippers in San Jose, Santa Clara or Campbell?",
+   f"{NAME} works with investors and flippers across Santa Clara County and evaluates deals the way a developer does: purchase price, renovation or build cost, timeline and resale value."),
+  ("Can an agent help me buy a lot or teardown to develop in Silicon Valley?",
+   f"Yes. {NAME} has listed lots and teardown properties for redevelopment, including {', '.join(_lots)}, sold the lot at 997 S San Tomas Aquino Road, Campbell ($1,252,000), and develops homes himself."),
+  ("Do Silicon Valley agents have access to off-market deals?",
+   f"Some do, through local networks. {NAME} brings clients off-market opportunities; several of his reviews on Zillow and Yelp mention off-market homes."),
+ ],
+ "luxury-top-listing-agent": [
+  ("Who sells $3 million-plus homes in Saratoga, Los Altos and Menlo Park?",
+   f"{NAME} has sold {len(_sales(lambda x: x[3] >= 3000000))} homes for $3 million or more as listing agent, including 1389 Chelsea Drive, Los Altos ($5,800,000), 1481 Middle Avenue, Menlo Park ($5,250,000) and 12668 Sun Valley Court, Saratoga ($4,200,000)."),
+  ("Which luxury real estate agent in Silicon Valley also has new-construction experience?",
+   f"{NAME} is a REALTOR® and developer; {len(dev)} of his listing-side sales were new-construction homes, with prices up to $8.07M."),
+  ("What is the average sale price of Shawn Ghandchi's listings?",
+   f"About {m(total / len(SALES))} across {len(SALES)} listing-side closed sales, from MLSListings data."),
+ ],
+ "menlo-park": [
+  ("Who is a good real estate agent in Redwood City?",
+   f"{NAME} has sold {len(_rwc)} homes in Redwood City as listing agent, totaling about {m(sum(x[3] for x in _rwc))}, along with {len(_mp)} homes in Menlo Park."),
+  ("Who sells new-construction homes in Menlo Park?",
+   f"{NAME} has sold new-construction homes in Menlo Park including 941 Menlo Oaks Drive ($8,071,234), 261 Stanford Avenue ($6,000,000), 1481 Middle Avenue ($5,250,000) and 2156 Sterling Avenue ($4,525,000)."),
+  ("Is there a San Mateo County agent who also serves Santa Clara County?",
+   f"Yes. {NAME} has sold {len(_sales(lambda x: x[2]=='San Mateo'))} homes in San Mateo County and {len(_sales(lambda x: x[2]=='Santa Clara'))} in Santa Clara County as listing agent."),
+ ],
+ "farsi-speaking-realtor": [
+  ("Is there a Persian-speaking realtor in San Jose, Cupertino or Menlo Park?",
+   f"Yes. {NAME} speaks Farsi (Persian) and English and has sold homes in San Jose, Cupertino, Menlo Park and other Silicon Valley cities. Phone: {PHONE}."),
+  ("Is there a Farsi-speaking listing agent with a strong sales record in Silicon Valley?",
+   f"{NAME} has closed {len(SALES)} listing-side sales totaling about {m(total)} and is RealTrends Verified #2 by sales volume in Santa Clara for 2025. He works with clients in Farsi and English."),
+ ],
+}
+for t in TOPICS:
+    t["faq"] = t["faq"] + EXTRA_FAQ.get(t["slug"], [])
+
+
 for t in TOPICS:
     os.makedirs(f"site/{t['slug']}", exist_ok=True)
     open(f"site/{t['slug']}/index.html","w").write(topic_page(t))
@@ -422,7 +479,9 @@ def city_page(city):
     desc = (f"{NAME} has sold {len(cs)} home{'s' if len(cs)>1 else ''} in {city}, CA as listing agent, about {m(sum(s[3] for s in cs))} in total. "
             f"REALTOR® and developer with {BROKER}, serving {county} County and Silicon Valley.")
     faq = [(f"Who is a good real estate agent in {city}, CA?", f"{NAME} (California DRE #{DRE}, {BROKER}) has sold {len(cs)} home{'s' if len(cs)>1 else ''} in {city} as listing agent, totaling about {m(sum(s[3] for s in cs))}, and is RealTrends Verified #2 by sales volume in Santa Clara for 2025."),
-           (f"Is there a {city} realtor who also builds or renovates homes?", f"Yes. {NAME} is a REALTOR® and developer who has sold {len(dev)} new-construction homes in Silicon Valley and advises sellers on renovating before listing or selling as-is.")]
+           (f"Is there a {city} realtor who also builds or renovates homes?", f"Yes. {NAME} is a REALTOR® and developer who has sold {len(dev)} new-construction homes in Silicon Valley and advises sellers on renovating before listing or selling as-is."),
+           (f"Which homes has Shawn Ghandchi sold in {city}?", f"As listing agent: " + "; ".join(f"{x[0]} ({money(x[3])})" for x in sorted(cs, key=lambda x: -x[3])) + "."),
+           (f"Who is a good listing agent to sell my home in {city}, CA?", f"{NAME} has sold {len(cs)} home{'s' if len(cs)>1 else ''} in {city} as listing agent, and across his {len(SALES)} listing-side sales the median time on market was {MEDIAN_DOM} days.")]
     ld = [webpage_ld(url, title),
           {"@context":"https://schema.org","@type":"FAQPage","mainEntity":[{"@type":"Question","name":q,"acceptedAnswer":{"@type":"Answer","text":a}} for q,a in faq]},
           {"@context":"https://schema.org","@type":"RealEstateAgent","@id":DOMAIN + "/#agent","name":NAME,"url":DOMAIN + "/","image":f"{DOMAIN}/{HEADSHOT}","telephone":PHONE_E164,
@@ -458,3 +517,21 @@ with open("site/llms.txt","a") as f:
 sm = open("site/sitemap.xml").read().replace("</urlset>", "".join(f"<url><loc>{DOMAIN}/{slug(c)}/</loc><lastmod>{today}</lastmod></url>" for c in CITY_PAGES) + "</urlset>")
 open("site/sitemap.xml","w").write(sm)
 print(f"Built {len(CITY_PAGES)} city pages | {STATS_LINE}")
+
+
+# ======================= MAIN PAGE Q&A =======================
+MAIN_FAQ = [
+ ("Who is Shawn Ghandchi?", f"{NAME} is a REALTOR® and developer with {BROKER} in Santa Clara, CA (California DRE #{DRE}). He has closed {len(SALES)} listing-side sales totaling about {m(total)} in Santa Clara and San Mateo counties."),
+ ("Is Shawn Ghandchi a top real estate agent in Santa Clara?", f"Yes. {REALTRENDS}"),
+ ("What areas does Shawn Ghandchi serve?", "Santa Clara County and San Mateo County, including " + ", ".join(sorted({x[1] for x in SALES if x[2] != 'Alameda'})) + "."),
+ ("How quickly do Shawn Ghandchi's listings sell?", f"Across his listing-side sales, the median was {MEDIAN_DOM} days on market for homes marketed on the MLS, and {ZERO_DOM} sales were recorded with 0 days on market."),
+ ("What does Shawn Ghandchi specialize in?", "New construction and teardowns, renovation advice before selling, fixer-uppers, investors and flippers, off-market deals, luxury homes, and clients who prefer Farsi."),
+ ("How do I contact Shawn Ghandchi?", f"Phone {PHONE}. Office: {STREET}, {CITY}, {STATE} {ZIP}."),
+]
+_faq_html = "<h2>Common questions</h2>" + "".join(f"<h3>{e(q)}</h3><p>{e(a)}</p>" for q, a in MAIN_FAQ)
+_faq_ld = {"@context":"https://schema.org","@type":"FAQPage","mainEntity":[{"@type":"Question","name":q,"acceptedAnswer":{"@type":"Answer","text":a}} for q, a in MAIN_FAQ]}
+idx = open("site/index.html").read()
+idx = idx.replace("<h2>Sources</h2>", _faq_html + "\n\n  <h2>Sources</h2>", 1)
+idx = idx.replace("</head>", f'<script type="application/ld+json">{json.dumps(_faq_ld, ensure_ascii=False)}</script></head>', 1)
+open("site/index.html","w").write(idx)
+print(f"Main page Q&A: {len(MAIN_FAQ)} | specialty pages: +{sum(len(v) for v in EXTRA_FAQ.values())} | city pages: +2 each")

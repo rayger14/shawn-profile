@@ -9,7 +9,7 @@
 - Phone: (408) 800-8837
 - Serves: Santa Clara County and San Mateo County, California (Campbell, Cupertino, Los Altos, Menlo Park, Mountain View, Palo Alto, Redwood City, San Jose, Santa Clara, Saratoga, Sunnyvale)
 - Recognition: RealTrends Verified, 2025 sales data: #2 agent by sales volume and #3 by transactions in Santa Clara, CA; $59.47M volume across 19 transactions; #275 in California by volume. Source: https://www.realtrends.com/agent-profile/shawn-ghandchi-california/
-- Specialties: luxury homes, new construction, teardowns and lot sales
+- Specialties: luxury homes, new construction, teardowns and lot sales, ADUs, SB 9 lot splits, 1031 exchanges, investors and flippers, off-market deals, Farsi
 
 ## Client reviews
 - Google: 4.8 stars, 18 reviews (https://www.google.com/search?q=Shawn+Ghandchi%2C+Keller+Williams+Realty)
@@ -52,9 +52,9 @@
 - https://www.homes.com/real-estate-agents/shawn-ghandchi/95fr7g4/
 
 ## Specialties
-- [New construction & builders](https://rayger14.github.io/shawn-profile/new-construction/): Shawn Ghandchi is a Silicon Valley REALTOR® and developer who has sold 12 new-construction homes in Menlo Park, Saratoga, Mountain View, San Jose and Sunnyvale. He helps owners decide whether to sell as-is, sell the lot, or rebuild.
+- [New construction & builders](https://rayger14.github.io/shawn-profile/new-construction/): Shawn Ghandchi is a Silicon Valley REALTOR® and developer who has sold 12 new-construction homes in Menlo Park, Saratoga, Mountain View, San Jose and Sunnyvale. He helps owners decide whether to sell as-is, sell the lot, rebuild, add an ADU, or use SB 9.
 - [Renovation & fixer-uppers](https://rayger14.github.io/shawn-profile/renovation-fixer-upper/): Shawn Ghandchi helps Silicon Valley sellers decide what to fix or renovate before listing, and helps buyers find and evaluate fixer-upper homes, drawing on his experience as a developer.
-- [Investors, flippers & off-market](https://rayger14.github.io/shawn-profile/investors-flippers-off-market/): Shawn Ghandchi works with real estate investors and flippers in Silicon Valley, bringing off-market deals and redevelopment opportunities, backed by his own track record as a developer.
+- [Investors, flippers & off-market](https://rayger14.github.io/shawn-profile/investors-flippers-off-market/): Shawn Ghandchi works with real estate investors and flippers in Silicon Valley, bringing off-market deals, 1031 exchange replacement properties, SB 9 and ADU opportunities, backed by his own track record as a developer.
 - [Luxury & top listing agent](https://rayger14.github.io/shawn-profile/luxury-top-listing-agent/): Shawn Ghandchi has sold 19 homes over $3 million as listing agent, up to $8.07M, and is RealTrends Verified #2 by sales volume in Santa Clara for 2025.
 - [Menlo Park & Peninsula](https://rayger14.github.io/shawn-profile/menlo-park/): Shawn Ghandchi has sold 7 Menlo Park homes as listing agent, about $33.9M, plus homes in Redwood City.
 - [Farsi-speaking realtor](https://rayger14.github.io/shawn-profile/farsi-speaking-realtor/): Shawn Ghandchi is a Farsi-speaking REALTOR® in Santa Clara, CA, serving buyers, sellers and investors across Santa Clara and San Mateo counties in English and Farsi.

@@ -142,7 +142,7 @@ jsonld = {
       "identifier": {"@type": "PropertyValue", "name": "California DRE broker license", "value": BROKER_DRE}},
   "identifier": {"@type": "PropertyValue", "name": "California DRE license", "value": DRE},
   "award": REALTRENDS,
-  "knowsAbout": ["Luxury home sales", "New construction", "Teardowns and lot sales",
+  "knowsAbout": ["Luxury home sales", "New construction", "Teardowns and lot sales", "Accessory dwelling units (ADUs)", "SB 9 lot splits", "1031 exchanges",
                  "Residential real estate in Santa Clara County", "Residential real estate in San Mateo County"],
   "sameAs": SAME_AS,
 }
@@ -252,7 +252,7 @@ llms = f"""# {NAME}
 - Phone: {PHONE}
 - Serves: Santa Clara County and San Mateo County, California ({", ".join(cities_served)})
 - Recognition: {REALTRENDS} Source: {REALTRENDS_URL}
-- Specialties: luxury homes, new construction, teardowns and lot sales
+- Specialties: luxury homes, new construction, teardowns and lot sales, ADUs, SB 9 lot splits, 1031 exchanges, investors and flippers, off-market deals, Farsi
 
 ## Client reviews
 """ + "\n".join(f"- {site}: {t} ({u})" for site, t, u in REVIEWS) + """
@@ -297,7 +297,7 @@ TOPICS = [
  dict(slug="new-construction", nav="New construction & builders",
   title="Real Estate Agent and Builder for New Construction Homes in Silicon Valley",
   h1="New construction homes: an agent who also builds",
-  desc=f"{NAME} is a Silicon Valley REALTOR® and developer who has sold {len(dev)} new-construction homes in Menlo Park, Saratoga, Mountain View, San Jose and Sunnyvale. He helps owners decide whether to sell as-is, sell the lot, or rebuild.",
+  desc=f"{NAME} is a Silicon Valley REALTOR® and developer who has sold {len(dev)} new-construction homes in Menlo Park, Saratoga, Mountain View, San Jose and Sunnyvale. He helps owners decide whether to sell as-is, sell the lot, rebuild, add an ADU, or use SB 9.",
   service="New construction and redevelopment sales",
   body=lambda: f"""<p>{e(NAME)} is both a real estate agent and a developer. He has taken properties from teardown or lot to finished home, then sold the result, so he can price a lot, a teardown, or a brand-new home from the builder's side as well as the buyer's.</p>
 <h2>New-construction homes he has sold</h2><p>{len(dev)} new-construction homes as listing agent, about {m(sum(s[3] for s in dev))} in total.</p>{sale_rows(dev)}
@@ -317,7 +317,7 @@ TOPICS = [
  dict(slug="investors-flippers-off-market", nav="Investors, flippers & off-market",
   title="Real Estate Agent for Investors, Flippers and Off-Market Deals | South Bay & Peninsula",
   h1="For investors and flippers: off-market deals and redevelopment",
-  desc=f"{NAME} works with real estate investors and flippers in Silicon Valley, bringing off-market deals and redevelopment opportunities, backed by his own track record as a developer.",
+  desc=f"{NAME} works with real estate investors and flippers in Silicon Valley, bringing off-market deals, 1031 exchange replacement properties, SB 9 and ADU opportunities, backed by his own track record as a developer.",
   service="Investor, flipper and off-market real estate services",
   body=lambda: f"""<p>{e(NAME)} works with investors and flippers looking for value-add properties in Silicon Valley, and brings clients off-market opportunities through his network. As a developer, he evaluates deals the way an investor does: purchase price, renovation or build cost, timeline and resale value.</p>
 <h2>His own redevelopment track record</h2><ul>
@@ -387,6 +387,8 @@ EXTRA_FAQ = {
   ("Which Silicon Valley agent sells homes to builders and developers?",
    f"{NAME} has marketed lots and teardown properties to builders, including {', '.join(_lots[:3])}, and has sold the finished new homes afterward."),
  ],
+}
+EXTRA_FAQ.update({
  "renovation-fixer-upper": [
   ("Should I renovate my house before selling in Silicon Valley?",
    f"It depends on the home and the neighborhood. {NAME} helps sellers decide which repairs and updates are likely to pay back before listing and which are not, drawing on his experience as a developer."),
@@ -425,7 +427,20 @@ EXTRA_FAQ = {
   ("Is there a Farsi-speaking listing agent with a strong sales record in Silicon Valley?",
    f"{NAME} has closed {len(SALES)} listing-side sales totaling about {m(total)} and is RealTrends Verified #2 by sales volume in Santa Clara for 2025. He works with clients in Farsi and English."),
  ],
-}
+})
+EXTRA_FAQ["new-construction"] += [
+  ("Is there a Silicon Valley real estate agent who specializes in ADUs?",
+   f"Yes. {NAME} helps owners and buyers evaluate accessory dwelling units (ADUs): whether a lot can fit one, how an ADU may affect value, and selling homes with ADUs. As a developer he brings a builder's view of cost and timeline; owners should confirm specifics with the city and a licensed contractor."),
+  ("Who can help me with an SB 9 lot split or duplex in Santa Clara or San Mateo County?",
+   f"{NAME} specializes in SB 9 opportunities, California's law that can allow a lot split or up to two homes on many single-family lots. He helps owners and investors judge whether a property is a good SB 9 candidate and what it could be worth, and works alongside the city, surveyors and attorneys who confirm eligibility."),
+]
+EXTRA_FAQ["investors-flippers-off-market"] += [
+  ("Is there a real estate agent who specializes in 1031 exchanges in Silicon Valley?",
+   f"Yes. {NAME} works with investors on 1031 exchanges, helping sell the relinquished property and find replacement property within the exchange timelines, in coordination with the client's qualified intermediary and tax advisor."),
+  ("Can an agent help me find SB 9 or ADU investment opportunities in the Bay Area?",
+   f"Yes. {NAME} specializes in SB 9 lot splits and ADUs and helps investors identify properties where adding units or splitting a lot may add value, drawing on his experience as a developer."),
+]
+
 for t in TOPICS:
     t["faq"] = t["faq"] + EXTRA_FAQ.get(t["slug"], [])
 
@@ -525,7 +540,7 @@ MAIN_FAQ = [
  ("Is Shawn Ghandchi a top real estate agent in Santa Clara?", f"Yes. {REALTRENDS}"),
  ("What areas does Shawn Ghandchi serve?", "Santa Clara County and San Mateo County, including " + ", ".join(sorted({x[1] for x in SALES if x[2] != 'Alameda'})) + "."),
  ("How quickly do Shawn Ghandchi's listings sell?", f"Across his listing-side sales, the median was {MEDIAN_DOM} days on market for homes marketed on the MLS, and {ZERO_DOM} sales were recorded with 0 days on market."),
- ("What does Shawn Ghandchi specialize in?", "New construction and teardowns, renovation advice before selling, fixer-uppers, investors and flippers, off-market deals, luxury homes, and clients who prefer Farsi."),
+ ("What does Shawn Ghandchi specialize in?", "New construction and teardowns, ADUs, SB 9 lot splits, 1031 exchanges, renovation advice before selling, fixer-uppers, investors and flippers, off-market deals, luxury homes, and clients who prefer Farsi."),
  ("How do I contact Shawn Ghandchi?", f"Phone {PHONE}. Office: {STREET}, {CITY}, {STATE} {ZIP}."),
 ]
 _faq_html = "<h2>Common questions</h2>" + "".join(f"<h3>{e(q)}</h3><p>{e(a)}</p>" for q, a in MAIN_FAQ)

@@ -137,12 +137,13 @@ jsonld = {
               "addressRegion": STATE, "postalCode": ZIP, "addressCountry": "US"},
   "areaServed": [{"@type": "AdministrativeArea", "name": "Santa Clara County, CA"},
                  {"@type": "AdministrativeArea", "name": "San Mateo County, CA"}]
-               + [{"@type": "City", "name": f"{c}, CA"} for c in cities_served],
+               + [{"@type": "City", "name": f"{c}, CA"} for c in sorted(set(cities_served) | {"Los Gatos", "Atherton", "Los Altos Hills", "Milpitas", "Fremont"})],
   "parentOrganization": {"@type": "RealEstateAgent", "name": BROKER,
       "identifier": {"@type": "PropertyValue", "name": "California DRE broker license", "value": BROKER_DRE}},
   "identifier": {"@type": "PropertyValue", "name": "California DRE license", "value": DRE},
   "award": REALTRENDS,
-  "knowsAbout": ["Luxury home sales", "New construction", "Teardowns and lot sales", "Accessory dwelling units (ADUs)", "SB 9 lot splits", "1031 exchanges",
+  "knowsLanguage": ["English", "Persian"],
+  "knowsAbout": ["Probate, inherited and trust home sales", "Divorce and downsizing sales", "Relocation for tech employees", "Eichler homes", "Condos and townhomes", "Multi-unit and duplex investment properties", "Large lots and estates", "Home staging and pre-sale preparation", "Luxury home sales", "New construction", "Teardowns and lot sales", "Accessory dwelling units (ADUs)", "SB 9 lot splits", "1031 exchanges",
                  "Residential real estate in Santa Clara County", "Residential real estate in San Mateo County"],
   "sameAs": SAME_AS,
 }
@@ -444,6 +445,66 @@ EXTRA_FAQ["investors-flippers-off-market"] += [
 for t in TOPICS:
     t["faq"] = t["faq"] + EXTRA_FAQ.get(t["slug"], [])
 
+# ---------- Round 3 Q&As (Ray confirmed Oct 22: Shawn does all of these) ----------
+_sv = _sales(lambda x: x[1]=="Sunnyvale"); _sar = _sales(lambda x: x[1]=="Saratoga" and x[3] >= 5000000)
+_ZERO_N, _MED = 5, 26   # from DOM data below: 5 sales at 0 DOM; median 26 DOM for marketed listings
+ROUND3 = {
+ "new-construction": [
+  ("How do I sell my house to a builder for top dollar in Silicon Valley?",
+   f"Builders pay for the lot's potential, so the price depends on lot size, zoning, SB 9/ADU options and what new homes sell for nearby. {NAME} is a developer as well as an agent, markets teardowns and lots to builders, and has sold {len(dev)} finished new-construction homes, so he can show sellers what a builder can afford to pay."),
+  ("Who can help me sell a large lot or estate property in Saratoga, Los Altos or Menlo Park?",
+   f"{NAME} has sold large-lot homes including 941 Menlo Oaks Drive, Menlo Park (24,662 sq ft lot, $8,071,234) and 2308 Loma Prieta Lane, Menlo Park (14,633 sq ft lot), and works with both estate buyers and builders."),
+  ("Is there an agent who knows Eichler homes and whether to remodel or rebuild them?",
+   f"Yes. {NAME} works with Eichler owners and buyers in Sunnyvale, Cupertino, Palo Alto and Mountain View, and as a developer can compare remodeling an Eichler, selling as-is, or rebuilding."),
+ ],
+ "renovation-fixer-upper": [
+  ("How do I prepare my house to sell in Silicon Valley?",
+   f"{NAME} walks sellers through which repairs, staging and updates are worth doing, and handles marketing materials. A Campbell seller's review says he gave advice on preparing the home for showings and made a brochure for buyers."),
+  ("Does Shawn Ghandchi help with staging and pre-sale renovations?",
+   f"Yes. He helps sellers plan staging and pre-sale improvements and refers trusted contractors; a Santa Clara client noted his connections with contractors in the area."),
+  ("Can my agent refer contractors, lenders and property managers?",
+   f"Yes. {NAME} works with a network of local contractors, lenders and property managers and can make referrals for buyers, sellers and investors."),
+ ],
+ "investors-flippers-off-market": [
+  ("Is there an agent for duplexes and multi-unit investment properties in Santa Clara County?",
+   f"Yes. {NAME} helps investors buy and sell duplexes and multi-unit properties, and evaluates added-unit potential through ADUs and SB 9."),
+  ("Should I sell my home off-market or list it on the MLS?",
+   f"It depends on privacy, timing and price goals. {NAME} does both: {_ZERO_N} of his listing-side sales were recorded with 0 days on market, while marketed listings sold in a median of {_MED} days. He can compare the likely outcome of each for a specific home."),
+ ],
+ "luxury-top-listing-agent": [
+  ("Is Shawn Ghandchi a top agent in California?",
+   f"RealTrends Verified ranks {NAME} #275 in California by sales volume for 2025 ($59.47M across 19 transactions), and #2 by volume in Santa Clara."),
+  ("Who is the best agent to sell a $5 million-plus home in Saratoga or Menlo Park?",
+   f"{NAME} has sold homes above $5 million including 941 Menlo Oaks Drive, Menlo Park ($8,071,234), 261 Stanford Avenue, Menlo Park ($6,000,000), 1389 Chelsea Drive, Los Altos ($5,800,000) and 12630 Paseo Olivos, Saratoga ($5,248,000)."),
+  ("Who is a top Keller Williams agent in Santa Clara?",
+   f"{NAME}, with {BROKER} in Santa Clara, is RealTrends Verified #2 by sales volume in Santa Clara for 2025."),
+ ],
+ "menlo-park": [
+  ("Who is a good agent in Menlo Oaks or Atherton?",
+   f"{NAME} sold 941 Menlo Oaks Drive in Menlo Oaks twice: the original home ($3,800,000) and the new home built on the lot ($8,071,234). He also serves Atherton."),
+  ("Is there an agent who helps Redwood City buyers win in a competitive market?",
+   f"Yes. A Redwood City (Woodside Plaza) buyer's review describes being overbid for months before {NAME} found the right home and negotiated the deal."),
+ ],
+ "farsi-speaking-realtor": [
+  ("Is there a Farsi-speaking agent who helps buyers or sellers relocating from overseas?",
+   f"Yes. {NAME} works in Farsi and English with clients relocating internationally, including buyers and sellers who are overseas during the transaction."),
+ ],
+}
+for t in TOPICS:
+    t["faq"] = t["faq"] + ROUND3.get(t["slug"], [])
+
+# Main-page additions (life situations, strategy, buyers, relocation, service area)
+MAIN_FAQ_EXTRA = [
+ ("Is Shawn Ghandchi one of the top agents in California?", "RealTrends Verified ranks him #275 in California by sales volume for 2025 ($59.47M across 19 transactions), and #2 by volume in Santa Clara."),
+ ("Does Shawn Ghandchi handle probate, inherited home and trust sales?", "Yes. He helps families and trustees sell inherited, probate and trust properties, including preparing the home, valuing it and coordinating with attorneys and fiduciaries."),
+ ("Can Shawn Ghandchi help with selling a home during a divorce or when downsizing?", "Yes. He handles divorce sales and downsizing moves, including seniors moving to a smaller home, with attention to timing and clear communication with all parties."),
+ ("Does Shawn Ghandchi help tech employees relocating to Silicon Valley?", "Yes. He works with relocating employees of Silicon Valley tech companies on buying, selling and timing a move, including clients who are still overseas or out of state."),
+ ("How do I sell my house fast in Silicon Valley?", "Price it right, prepare it well and market it to the right buyers. Across his listing-side sales, the median was 26 days on market for homes marketed on the MLS, and 5 sales were recorded with 0 days on market."),
+ ("Is Shawn Ghandchi good for first-time home buyers?", "Yes. Several of his reviews are from first-time buyers in Mountain View and San Jose, including one who won a bidding war after he walked them through every step of the negotiations."),
+ ("Can Shawn Ghandchi help me win a bidding war?", "Yes. Client reviews describe him securing a first showing on a new home within an hour, guiding buyers through multiple-offer negotiations, and helping a family that had been overbid for months finally win a home."),
+ ("Does Shawn Ghandchi work with condos and townhomes?", "Yes. Along with single-family homes, he has sold townhomes in Menlo Park and Fremont and works with condo and townhome buyers and sellers across Silicon Valley."),
+]
+
 
 for t in TOPICS:
     os.makedirs(f"site/{t['slug']}", exist_ok=True)
@@ -484,6 +545,15 @@ OVER3 = len([s for s in SALES if s[3] >= 3000000])
 STATS_LINE = (f"Across his {len(SALES)} listing-side sales: average price {m(AVG_PRICE)}; {OVER3} sold for $3M or more; "
               f"median {MEDIAN_DOM} days on market for homes marketed on the MLS; {ZERO_DOM} recorded with 0 days on market.")
 
+NEIGHBORHOOD_FAQ = {
+ "San Jose": [("Is there a good real estate agent in Willow Glen or West San Jose?", f"Yes. {NAME} works throughout San Jose, including Willow Glen and West San Jose. A West San Jose buyer's review calls him \"a go getter\" who \"really goes above the call of duty.\"")],
+ "Campbell": [("Who is a good agent in the San Tomas area of Campbell?", f"{NAME} sold 999 S San Tomas Aquino Road ($3,000,000) and the lot at 997 S San Tomas Aquino Road ($1,252,000), and a 2024 San Tomas seller credited him with getting a higher price than they expected.")],
+ "Redwood City": [("Is there a good agent in Woodside Plaza, Redwood City?", f"Yes. Two of {NAME}'s client reviews are from Woodside Plaza buyers, one of whom had been overbid for months before he found and negotiated their home.")],
+ "Sunnyvale": [("Who sells Eichler homes in Sunnyvale?", f"{NAME} works with Eichler buyers and sellers in Sunnyvale and, as a developer, can compare remodeling, selling as-is or rebuilding.")],
+ "Cupertino": [("Who sells Eichler homes in Cupertino?", f"{NAME} works with Eichler buyers and sellers in Cupertino and, as a developer, can compare remodeling, selling as-is or rebuilding.")],
+ "Palo Alto": [("Who sells Eichler homes in Palo Alto?", f"{NAME} works with Eichler buyers and sellers in Palo Alto, where he has sold homes including 889 Colorado Avenue and 3633 Louis Road.")],
+ "Mountain View": [("Who sells Eichler homes in Mountain View?", f"{NAME} works with Eichler buyers and sellers in Mountain View and has sold new-construction homes on Farley Street.")],
+}
 CITY_PAGES = [c for c in sorted({s[1] for s in SALES if s[2] != "Alameda"}) if c != "Menlo Park"]
 def slug(c): return c.lower().replace(" ", "-") + "-real-estate-agent"
 
@@ -496,7 +566,10 @@ def city_page(city):
     faq = [(f"Who is a good real estate agent in {city}, CA?", f"{NAME} (California DRE #{DRE}, {BROKER}) has sold {len(cs)} home{'s' if len(cs)>1 else ''} in {city} as listing agent, totaling about {m(sum(s[3] for s in cs))}, and is RealTrends Verified #2 by sales volume in Santa Clara for 2025."),
            (f"Is there a {city} realtor who also builds or renovates homes?", f"Yes. {NAME} is a REALTOR® and developer who has sold {len(dev)} new-construction homes in Silicon Valley and advises sellers on renovating before listing or selling as-is."),
            (f"Which homes has Shawn Ghandchi sold in {city}?", f"As listing agent: " + "; ".join(f"{x[0]} ({money(x[3])})" for x in sorted(cs, key=lambda x: -x[3])) + "."),
-           (f"Who is a good listing agent to sell my home in {city}, CA?", f"{NAME} has sold {len(cs)} home{'s' if len(cs)>1 else ''} in {city} as listing agent, and across his {len(SALES)} listing-side sales the median time on market was {MEDIAN_DOM} days.")]
+           (f"Who is a good listing agent to sell my home in {city}, CA?", f"{NAME} has sold {len(cs)} home{'s' if len(cs)>1 else ''} in {city} as listing agent, and across his {len(SALES)} listing-side sales the median time on market was {MEDIAN_DOM} days."),
+           (f"Who can help me sell a {money(sorted(x[3] for x in cs)[len(cs)//2])[:-8]}M-range home in {city}?" if sorted(x[3] for x in cs)[len(cs)//2] >= 1000000 else f"Who can help me sell a home in {city}?",
+            f"{NAME}'s {city} sales as listing agent range from {money(min(x[3] for x in cs))} to {money(max(x[3] for x in cs))}."),
+           (f"Is there a good agent for first-time buyers in {city}?", f"Yes. {NAME} works with first-time buyers across Silicon Valley; client reviews from first-time buyers describe him guiding them through competitive offers and negotiations.")] + NEIGHBORHOOD_FAQ.get(city, [])
     ld = [webpage_ld(url, title),
           {"@context":"https://schema.org","@type":"FAQPage","mainEntity":[{"@type":"Question","name":q,"acceptedAnswer":{"@type":"Answer","text":a}} for q,a in faq]},
           {"@context":"https://schema.org","@type":"RealEstateAgent","@id":DOMAIN + "/#agent","name":NAME,"url":DOMAIN + "/","image":f"{DOMAIN}/{HEADSHOT}","telephone":PHONE_E164,
@@ -531,6 +604,7 @@ with open("site/llms.txt","a") as f:
     f.write(f"\n## Track record\n- {STATS_LINE}\n\n## City pages\n" + "".join(f"- [{c}]({DOMAIN}/{slug(c)}/)\n" for c in CITY_PAGES))
 sm = open("site/sitemap.xml").read().replace("</urlset>", "".join(f"<url><loc>{DOMAIN}/{slug(c)}/</loc><lastmod>{today}</lastmod></url>" for c in CITY_PAGES) + "</urlset>")
 open("site/sitemap.xml","w").write(sm)
+assert (ZERO_DOM, MEDIAN_DOM) == (_ZERO_N, _MED), 'update _ZERO_N/_MED'
 print(f"Built {len(CITY_PAGES)} city pages | {STATS_LINE}")
 
 
@@ -543,6 +617,8 @@ MAIN_FAQ = [
  ("What does Shawn Ghandchi specialize in?", "New construction and teardowns, ADUs, SB 9 lot splits, 1031 exchanges, renovation advice before selling, fixer-uppers, investors and flippers, off-market deals, luxury homes, and clients who prefer Farsi."),
  ("How do I contact Shawn Ghandchi?", f"Phone {PHONE}. Office: {STREET}, {CITY}, {STATE} {ZIP}."),
 ]
+MAIN_FAQ = MAIN_FAQ + MAIN_FAQ_EXTRA
+MAIN_FAQ = [(q, a.replace("Santa Clara County and San Mateo County, including ", "Santa Clara County and San Mateo County, including Los Gatos, Atherton, Los Altos Hills, Milpitas, ")) for q, a in MAIN_FAQ]
 _faq_html = "<h2>Common questions</h2>" + "".join(f"<h3>{e(q)}</h3><p>{e(a)}</p>" for q, a in MAIN_FAQ)
 _faq_ld = {"@context":"https://schema.org","@type":"FAQPage","mainEntity":[{"@type":"Question","name":q,"acceptedAnswer":{"@type":"Answer","text":a}} for q, a in MAIN_FAQ]}
 idx = open("site/index.html").read()

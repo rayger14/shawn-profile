@@ -693,3 +693,40 @@ for _slug in [t["slug"] for t in TOPICS] + [slug(c) for c in CITY_PAGES]:
 with open("site/llms.txt", "a") as f:
     f.write("\n## What clients say (verbatim excerpts from Zillow reviews)\n" + "".join(f'- "{q["text"]}" ({q["who"]}, Zillow: {ZILLOW})\n' for q in QUOTES))
 print(f"Placed {_n} client quotes across pages")
+
+# ---- Search-result titles and descriptions sized for Google/Bing (titles <=60, descriptions 120-160) ----
+import glob as _glob, html as _html, re as _re
+SNIPPETS = {
+    "": ("Shawn Ghandchi | Santa Clara & San Mateo REALTOR®",
+         "Shawn Ghandchi, Keller Williams REALTOR® and developer in Santa Clara and San Mateo counties: new construction, luxury, investors, ADUs. DRE #01979089."),
+    "new-construction": ("Realtor & Builder, New Construction | Shawn Ghandchi",
+         "Silicon Valley REALTOR® who also builds: Shawn Ghandchi sells new construction and helps owners decide whether to sell a teardown, rebuild, add an ADU or SB 9."),
+    "renovation-fixer-upper": ("Fixer-Upper & Renovation Realtor | Shawn Ghandchi",
+         "Shawn Ghandchi helps Santa Clara County sellers renovate and prepare homes before listing, and helps buyers find fixer-uppers, with builder experience."),
+    "investors-flippers-off-market": ("Investor & Off-Market Realtor, South Bay | Shawn Ghandchi",
+         "Shawn Ghandchi works with investors and flippers across the South Bay and Peninsula: off-market homes, teardowns, lots, SB 9, ADUs and 1031 exchanges."),
+    "luxury-top-listing-agent": ("Luxury Listing Agent, Silicon Valley | Shawn Ghandchi",
+         "Luxury listing agent Shawn Ghandchi has sold $3M+ homes in Menlo Park, Los Altos and Saratoga. RealTrends Verified, Keller Williams, DRE #01979089."),
+    "menlo-park": ("Menlo Park Real Estate Agent | Shawn Ghandchi",
+         "Shawn Ghandchi has sold Menlo Park and Redwood City homes as listing agent and developer, including new construction in Menlo Oaks. See sales and Q&A."),
+    "farsi-speaking-realtor": ("Farsi-Speaking Realtor, Silicon Valley | Shawn Ghandchi",
+         "Shawn Ghandchi is a Farsi-speaking (Persian) REALTOR® serving Santa Clara and San Mateo counties, with a strong listing record. مشاور املاک فارسی‌زبان"),
+}
+def _city_snip(city):
+    return (f"{city} Real Estate Agent | Shawn Ghandchi",
+            f"Shawn Ghandchi, Keller Williams REALTOR® and developer, sells homes in {city}, CA. See his {city} sales, prices and answers to seller questions.")
+_n_fixed = 0
+for _f in _glob.glob("site/**/index.html", recursive=True):
+    _key = _f[len("site/"):-len("index.html")].strip("/")
+    if _key in SNIPPETS:
+        _t, _d = SNIPPETS[_key]
+    else:
+        _city = next((c for c in CITY_PAGES if slug(c) == _key), None)
+        if not _city: continue
+        _t, _d = _city_snip(_city)
+    assert len(_t) <= 60 and 110 <= len(_d) <= 160, (_key, len(_t), len(_d))
+    _h = open(_f).read()
+    _h = _re.sub(r"<title>.*?</title>", f"<title>{_html.escape(_t, quote=False)}</title>", _h, count=1, flags=_re.S)
+    _h = _re.sub(r'<meta name="description" content=".*?">', f'<meta name="description" content="{_html.escape(_d)}">', _h, count=1, flags=_re.S)
+    open(_f, "w").write(_h); _n_fixed += 1
+print(f"Search snippets set on {_n_fixed} pages")
